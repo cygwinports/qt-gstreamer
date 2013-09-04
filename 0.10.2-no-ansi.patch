@@ -1,0 +1,13 @@
+setenv is guarded by !__STRICT_ANSI__
+
+--- origsrc/qt-gstreamer-0.10.2/cmake/modules/FindQtGStreamer.cmake	2012-04-15 04:03:08.000000000 -0500
++++ src/qt-gstreamer-0.10.2/cmake/modules/FindQtGStreamer.cmake	2013-09-03 15:11:50.545335900 -0500
+@@ -118,7 +118,7 @@ if(QTGSTREAMER_FOUND)
+             if (NOT QTGSTREAMER_FLAGS) # be quiet if we try to find QtGStreamer multiple times
+                 message(STATUS "GCC 4.5 or later detected. Enabling C++0x support in QTGSTREAMER_FLAGS.")
+             endif()
+-            set(QTGSTREAMER_FLAGS "-std=c++0x")
++            set(QTGSTREAMER_FLAGS "-std=gnu++0x")
+         endif()
+     endif()
+ 

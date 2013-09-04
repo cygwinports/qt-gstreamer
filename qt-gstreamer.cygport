@@ -1,0 +1,28 @@
+inherit qt4-cmake
+
+NAME="qt-gstreamer"
+VERSION=0.10.2
+RELEASE=1
+CATEGORY="Libs"
+SUMMARY="Qt interface for GStreamer"
+DESCRIPTION="QtGStreamer is a set of libraries and plugins providing C++
+bindings for GStreamer with a Qt-style API plus some helper classes for
+integrating GStreamer better in Qt applications."
+HOMEPAGE="http://gstreamer.freedesktop.org/"
+SRC_URI="http://gstreamer.freedesktop.org/src/qt-gstreamer/qt-gstreamer-${VERSION}.tar.bz2" 
+PATCH_URI="
+	0.10.2-no-ansi.patch
+	0.10.2-cmake-install.patch
+"
+
+PKG_NAMES="${NAME} gstreamer0.10-plugins-qt libQtGLib2.0_0 libQtGLib2.0-devel
+           libQtGStreamer0.10_0 libQtGStreamer0.10-devel"
+qt_gstreamer_CONTENTS="usr/lib/qt4/imports/QtGStreamer/ usr/share/doc/qt-gstreamer/"
+gstreamer0_10_plugins_qt_CONTENTS="usr/lib/gstreamer-0.10/cyggstqt*.dll"
+libQtGLib2_0_0_CONTENTS="usr/bin/cygQtGLib-2.0-0.dll"
+libQtGLib2_0_devel_CONTENTS="usr/include/QtGStreamer/QGlib/
+	usr/lib/libQtGLib-2.0.dll.a usr/lib/pkgconfig/QtGLib-2.0.pc"
+libQtGStreamer0_10_0_REQUIRES="gstreamer0.10-plugins-qt"
+libQtGStreamer0_10_0_CONTENTS="usr/bin/cygQtGStreamer*-0.10-0.dll"
+libQtGStreamer0_10_devel_CONTENTS="usr/include/QtGStreamer/QGst/ usr/lib/QtGStreamer/
+	usr/lib/libQtGStreamer*-0.10.dll.a usr/lib/pkgconfig/QtGStreamer*-0.10.pc"

@@ -1,8 +1,8 @@
-inherit qt4-cmake
+inherit qt4-cmake qt5
 
 NAME="qt-gstreamer"
 VERSION=1.2.0
-RELEASE=1
+RELEASE=2
 CATEGORY="Libs"
 SUMMARY="Qt interface for GStreamer"
 DESCRIPTION="QtGStreamer is a set of libraries and plugins providing C++
@@ -11,18 +11,78 @@ integrating GStreamer better in Qt applications."
 HOMEPAGE="http://gstreamer.freedesktop.org/"
 SRC_URI="http://gstreamer.freedesktop.org/src/qt-gstreamer/qt-gstreamer-${VERSION}.tar.xz"
 PATCH_URI="
-	0.10.3-no-ansi.patch
+	http://pkgs.fedoraproject.org/cgit/rpms/qt-gstreamer.git/plain/0001-gstqtvideosink-fix-memory-leak-and-synchronization-i.patch
+	http://pkgs.fedoraproject.org/cgit/rpms/qt-gstreamer.git/plain/0002-CMakeLists.txt-actually-require-GStreamer-1.2.0.patch
+	http://pkgs.fedoraproject.org/cgit/rpms/qt-gstreamer.git/plain/0003-qtglvideosinkbase-don-t-use-variable-name-interface-.patch
+	http://pkgs.fedoraproject.org/cgit/rpms/qt-gstreamer.git/plain/0004-Add-pbutils-include-directory-to-include-paths.patch
+	http://pkgs.fedoraproject.org/cgit/rpms/qt-gstreamer.git/plain/0005-Workaround-build-failures-with-boost-1.57-and-moc.patch
+	http://pkgs.fedoraproject.org/cgit/rpms/qt-gstreamer.git/plain/0006-Fix-compilation-with-GStreamer-1.5.1.patch
+	http://pkgs.fedoraproject.org/cgit/rpms/qt-gstreamer.git/plain/qt-gstreamer-1.2.0-boost_160.patch
 "
 
-PKG_NAMES="${NAME} gstreamer1.0-plugins-qt libQtGLib2.0_0 libQtGLib2.0-devel
-           libQtGStreamer1.0_0 libQtGStreamer1.0-devel"
-qt_gstreamer_CONTENTS="usr/lib/qt4/imports/QtGStreamer/ usr/share/doc/qt-gstreamer/"
-gstreamer1_0_plugins_qt_CONTENTS="usr/lib/gstreamer-1.0/cyggstqt*.dll"
+PKG_NAMES="gstreamer1.0-plugins-qt gstreamer1.0-plugins-qt5
+           libQtGLib2.0_0 libQtGLib2.0-devel
+           libQtGStreamer1.0_0 libQtGStreamer1.0-devel
+           libQt5GLib2.0_0 libQt5GLib2.0-devel
+           libQt5GStreamer1.0_0 libQt5GStreamer1.0-devel"
+gstreamer1_0_plugins_qt_CONTENTS="usr/lib/gstreamer-1.0/cyggstqt[^5]*.dll"
 libQtGLib2_0_0_CONTENTS="usr/bin/cygQtGLib-2.0-0.dll"
-libQtGLib2_0_devel_CONTENTS="usr/include/QtGStreamer/QGlib/
-	usr/lib/libQtGLib-2.0.dll.a usr/lib/pkgconfig/QtGLib-2.0.pc"
+libQtGLib2_0_devel_CONTENTS="
+	usr/include/QtGStreamer/QGlib/
+	usr/lib/libQtGLib-2.0.dll.a
+	usr/lib/pkgconfig/QtGLib-2.0.pc
+"
 libQtGStreamer1_0_0_REQUIRES="gstreamer1.0-plugins-qt"
-libQtGStreamer1_0_0_CONTENTS="usr/bin/cygQtGStreamer*-1.0-0.dll"
+libQtGStreamer1_0_0_CONTENTS="
+	usr/bin/cygQtGStreamer*-1.0-0.dll
+	usr/lib/qt4/imports/QtGStreamer/
+	usr/share/doc/qt-gstreamer/
+"
 libQtGStreamer1_0_devel_OBSOLETES="libQtGStreamer0.10-devel"
-libQtGStreamer1_0_devel_CONTENTS="usr/include/QtGStreamer/QGst/ usr/lib/cmake/QtGStreamer/
-	usr/lib/libQtGStreamer*-1.0.dll.a usr/lib/pkgconfig/QtGStreamer*-1.0.pc"
+libQtGStreamer1_0_devel_CONTENTS="
+	usr/include/QtGStreamer/QGst/
+	usr/lib/cmake/QtGStreamer/
+	usr/lib/libQtGStreamer*-1.0.dll.a
+	usr/lib/pkgconfig/QtGStreamer*-1.0.pc
+"
+gstreamer1_0_plugins_qt5_CONTENTS="usr/lib/gstreamer-1.0/cyggstqt5*.dll"
+libQt5GLib2_0_0_CONTENTS="usr/bin/cygQt5GLib-2.0-0.dll"
+libQt5GLib2_0_devel_CONTENTS="
+	usr/include/Qt5GStreamer/QGlib/
+	usr/lib/libQt5GLib-2.0.dll.a
+	usr/lib/pkgconfig/Qt5GLib-2.0.pc
+"
+libQt5GStreamer1_0_0_REQUIRES="gstreamer1.0-plugins-qt5"
+libQt5GStreamer1_0_0_CONTENTS="
+	usr/bin/cygQt5GStreamer*-1.0-0.dll
+	usr/lib/qt5/qml/QtGStreamer/
+	usr/share/doc/qt5-gstreamer/
+"
+libQt5GStreamer1_0_devel_CONTENTS="
+	usr/include/Qt5GStreamer/QGst/
+	usr/lib/cmake/Qt5GStreamer/
+	usr/lib/libQt5GStreamer*-1.0.dll.a
+	usr/lib/pkgconfig/Qt5GStreamer*-1.0.pc
+"
+
+src_compile() {
+	mkdir -p ${B}/qt4
+	cd ${B}/qt4
+	qt4_cmake_compile -DQT_VERSION=4
+
+	mkdir -p ${B}/qt5
+	cd ${B}/qt5
+	cygcmake -DQT_VERSION=5
+	cygmake
+}
+
+src_install() {
+	cd ${B}/qt4
+	cyginstall
+
+	cd ${B}/qt5
+	cyginstall
+
+	docinto /qt5-gstreamer
+	dodoc ${S}/{COPYING,NEWS,README}
+}
